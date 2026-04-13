@@ -322,7 +322,8 @@ async function startMicrophone() {
         autoGainControl: true,
       }
     });
-
+    // recommended pcm_16000
+    // https://elevenlabs.io/docs/eleven-api/guides/how-to/speech-to-text/realtime/transcripts-and-commit-strategies#supported-audio-formats
     audioContext = new AudioContext({ sampleRate: 16000 });
 
     const workletUrl = 'data:application/javascript,' + encodeURIComponent(WORKLET_CODE);
