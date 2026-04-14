@@ -107,6 +107,42 @@
     color: #e1e4e8;
   }
 
+  .language-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .language-row label {
+    font-size: 0.85rem;
+    color: #8b949e;
+    white-space: nowrap;
+  }
+
+  .language-select {
+    flex: 1;
+    max-width: 260px;
+    padding: 0.5rem 0.75rem;
+    background: #161b22;
+    color: #e1e4e8;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238b949e' viewBox='0 0 16 16'%3E%3Cpath d='M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2rem;
+  }
+
+  .language-select:focus {
+    outline: none;
+    border-color: #58a6ff;
+  }
+
   .transcript-section {
     background: #161b22;
     border: 1px solid #30363d;
@@ -146,6 +182,17 @@
     <span class="status-text" id="statusText">Disconnected</span>
     <span class="region-badge" id="latencyBadge">Latency: --</span>
     <span class="region-badge" id="regionBadge">Region: --</span>
+  </div>
+
+  <div class="language-row">
+    <label for="langSelect">Language:</label>
+    <select class="language-select" id="langSelect">
+      <option value="">Auto-detect</option>
+      <option value="en">English</option>
+      <option value="ms">Malay</option>
+      <option value="zh">Chinese</option>
+      <option value="ta">Tamil</option>
+    </select>
   </div>
 
   <div class="controls">
@@ -205,6 +252,7 @@ const statusDot     = $('#statusDot');
 const statusText    = $('#statusText');
 const regionBadge   = $('#regionBadge');
 const latencyBadge  = $('#latencyBadge');
+const langSelect    = $('#langSelect');
 const committedEl   = $('#committedText');
 const placeholder   = $('#placeholder');
 const transcriptSection = $('#transcriptSection');
@@ -250,6 +298,7 @@ function arrayBufferToBase64(buffer) {
 async function startRecording() {
   btnStart.disabled = true;
   btnStop.disabled = false;
+  langSelect.disabled = true;
   setStatus('connecting', 'Connecting...');
 
   try {
@@ -263,6 +312,11 @@ async function startRecording() {
       include_timestamps: 'true',
       token: token,
     });
+
+    const lang = langSelect.value;
+    if (lang) {
+      params.set('language_code', lang);
+    }
 
     const wsUrl = `wss://api.elevenlabs.io/v1/speech-to-text/realtime?${params}`;
 
@@ -304,6 +358,7 @@ async function startRecording() {
       setStatus('', 'Disconnected');
       btnStart.disabled = false;
       btnStop.disabled = true;
+      langSelect.disabled = false;
     };
 
   } catch {
@@ -377,6 +432,7 @@ function stopRecording() {
   setStatus('', 'Disconnected');
   btnStart.disabled = false;
   btnStop.disabled = true;
+  langSelect.disabled = false;
 }
 
 btnStart.addEventListener('click', startRecording);
